@@ -154,53 +154,10 @@ class Grade(db.Model):
     grade=db.Column(db.Integer, primary_key=True)
 
 
-
-
-
-
-
 class Permission:
-    # 企业信息查询
-    COM_INFOR_SEARCH = 0X0000009
-    # 企业信息编辑
-    COM_INFOR_EDIT = 0X000000B
-    # 企业信息审核
-    COM_INFOR_CHECK = 0X000000F
 
-    # 实习企业信息列表
-    INTERNCOMPANY_LIST = 0X0000008
-    # 学生实习信息列表
-    STU_INTERN_LIST = 0X0000010
-
-    # 学生实习信息查看
-    STU_INTERN_SEARCH = 0X0000030
-    # 学生实习信息编辑
-    STU_INTERN_EDIT = 0X0000070
-    # 学生实习信息审核
-    STU_INTERN_CHECK = 0X00000F0
-
-    # 学生实习日志查询
-    STU_JOUR_SEARCH = 0X0000210
-    # 学生实习日志编辑
-    STU_JOUR_EDIT = 0X0000610
-    # 学生实习日志审核
-    STU_JOUR_CHECK = 0X0000E10
-
-    # 学生实习总结查看
-    STU_SUM_SEARCH = 0X0001010
-    # 学生实习总结编辑
-    STU_SUM_EDIT = 0X0003010
-    # 学生实习总结和成果审核
-    STU_SUM_SCO_CHECK = 0X0007010
-
-    # 学生信息管理
-    STU_INTERN_MANAGE = 0X0010000
-    # 老师信息管理
-    TEA_INFOR_MANAGE = 0X0020000
     # 权限管理
     PERMIS_MANAGE = 0X0040000
-    #下拉框管理
-    SELECT_MANAGE=0X0080000
-    #上传探访记录
-    UPLOAD_VISIT= 0X0100030
+
+
 

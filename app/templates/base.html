@@ -78,88 +78,73 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    {% if current_user.is_authenticated %}
-                        {% if current_user.can(Permission.INTERNCOMPANY_LIST) %}
-                            <li><a ></a></li>
-                        {% endif %}
-                        <li><a >上传</a></li>
-                        {% if current_user.roleId==0 %}
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="">查看<span
-                                        class="caret"></span>
-                                    {% if session['message']['0']==1 or session['message']['1']==1 or session['message']['2']==1 %}
-                                        <span class="glyphicon glyphicon-bell"></span>
-                                    {% endif %}
+                    {% if current_user.is_authenticated %}   <!-- is_authenticated方法是一个误导性的名字的方法，通常这个方法应该返回True，除非对象代表一个由于某种原因没有被认证的用户。-->
 
+                        <li><a class="dropdown-toggle" data-toggle="dropdown" href="">
+                                    上传<span class="caret"></span>
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="{{ url_for('main.stuInternList') }}">
-                                        {% if session['message']['0']==1 %}
-                                            <span class="glyphicon glyphicon-bell"></span>
-                                        {% endif %}</a>
-                                    </li>
+                            <ul class="dropdown-menu">
+                                {% if current_user.can(Permission.PERMIS_MANAGE) %}
+                                    <li><a>任务列表上传</a></li>
                                     <li class="divider"></li>
-                                    <li><a href="{{ url_for('main.stuJournalList') }}">查看任务
-                                        {% if session['message']['1']==1 %}
-                                            <span class="glyphicon glyphicon-bell"></span>
-                                        {% endif %}</a>
-                                    </li>
+                                    <li><a>上传学生名单</a></li>
                                     <li class="divider"></li>
-                                    <li><a href="{{ url_for('main.stuSumList') }}">查看文件
-                                        {% if session['message']['2']==1 %}
-                                            <span class="glyphicon glyphicon-bell"></span>
-                                        {% endif %}</a></li>
+                                {% endif %}
+                                    <li><a>任务上传</a></li>
+
                                 </ul>
-                            </li>
-                        {% elif current_user.can(Permission.STU_INTERN_LIST) %}
+                        </li>
+
+                        {% if current_user.is_authenticated %}
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="">
                                     查看<span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a>查看教师上交进度</a></li>
-                                    <li class="divider"></li>
+
+
                                     <li><a>查看所有任务</a></li>
                                     <li class="divider"></li>
                                     <li><a>查看已交文件</a></li>
-                                    {% if current_user.can(Permission.STU_INTERN_SEARCH) and current_user.can(Permission.STU_JOUR_SEARCH) and current_user.can(Permission.STU_SUM_SEARCH) %}
+                                    {% if current_user.can(Permission.PERMIS_MANAGE) %}
+                                        <li class="divider"></li>
+                                        <li><a>查看教师上交进度</a></li>
                                         <li class="divider"></li>
                                         <li><a>批量下载文件</a></li>
+
                                     {% endif %}
                                 </ul>
                             </li>
                         {% endif %}
-                        {% if current_user.can(Permission.UPLOAD_VISIT) %}
 
-                        {% endif %}
-                        {% if current_user.can(Permission.STU_INTERN_MANAGE) or current_user.can(Permission.PERMIS_MANAGE) or current_user.can(Permission.TEA_INFOR_MANAGE) or current_user.can(Permission.SELECT_MANAGE) %}
+                        {% if current_user.can(Permission.PERMIS_MANAGE) %}
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                     管理<span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    {% if current_user.can(Permission.STU_INTERN_MANAGE) or current_user.can(Permission.TEA_INFOR_MANAGE) %}
+
                                         <li class="dropdown-submenu">
                                             <a tabindex="-1" href="">用户管理</a>
                                             <ul class="dropdown-menu">
-                                                {% if current_user.can(Permission.STU_INTERN_MANAGE) %}
+
                                                     <li><a tabindex="-1">学生用户</a></li>
-                                                {% endif %}
-                                                {% if current_user.can(Permission.TEA_INFOR_MANAGE) %}
+
+
                                                     <li><a tabindex="-1">教师用户</a>
                                                     </li>
-                                                {% endif %}
+
                                             </ul>
                                         </li>
-                                    {% endif %}
-                                    {% if current_user.can(Permission.PERMIS_MANAGE) %}
+
+
                                         <li class="divider"></li>
-                                        <li><a >权限管理</a></li>
-                                    {% endif %}
-                                    {% if current_user.can(Permission.SELECT_MANAGE) %}
+                                        <li><a href="{{ url_for('main.roleList') }}">权限管理</a></li>
+
+
                                         <li class="divider"></li>
                                         <li><a >下拉框管理</a></li>
-                                    {% endif %}
+
                                 </ul>
                             </li>
                         {% endif %}
