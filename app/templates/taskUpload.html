@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+
+
+{% block title %}系统角色{% endblock %}
+{% block head %}
+    {{ super() }}
+    <!-- 确认删除窗口 ,传递参数-->
+<script type="text/javascript">
+        function ComfirmDelete(str) {
+            $('#deleteToggle').modal();
+            var obj = document.getElementById("roleId");
+            obj.value = str
+        }
+    </script>
+{% endblock %}<!--先执行父模板-->
+
+{% block page_content %}
+
+<h3><a class="btn btn-info btn-ms" href="{{ url_for('main.oneTaskupload') }}">
+        <span class="glyphicon glyphicon-plus"></span>单个任务上传</a></h3>
+<h3><a class="btn btn-info btn-ms" href="{{ url_for('main.batchTaskupload', from_url='taskList') }}">
+        <span class="glyphicon glyphicon-plus"></span>任务批量上传</a></h3>
+    <p></p>
+
+
+{% endblock %}

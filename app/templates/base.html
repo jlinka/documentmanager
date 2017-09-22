@@ -85,7 +85,7 @@
                                 </a>
                             <ul class="dropdown-menu">
                                 {% if current_user.can(Permission.PERMIS_MANAGE) %}
-                                    <li><a>任务列表上传</a></li>
+                                    <li><a href="{{ url_for('main.taskUpload') }}">任务列表上传</a></li>
                                     <li class="divider"></li>
                                     <li><a>上传学生名单</a></li>
                                     <li class="divider"></li>

@@ -50,8 +50,9 @@ class taskForm(Form):
     taskName = StringField('任务名字', validators=[Required(message='此项不能为空')])
     taskTeaId = StringField('任务所属教师ID', validators=[Required(message='此项不能为空')])
     taskTeaName = StringField('任务所属教师名字', validators=[Required(message='此项不能为空')])
-    taskDeadline = StringField('任务截至日期', validators=[Required(message='此项不能为空')])
+    taskDeadline = DateTimeField('任务截至日期', format='%Y-%m-%d', validators=[Required(message='请按 年-月-日 的格式输入正确的日期')])
     taskType = StringField('任务类型', validators=[Required(message='此项不能为空')])
     taskflag = SelectField('任务完成标记', choices=[('已完成', '已完成'), ('未完成', '未完成')], default='未完成')
     taskFile = FileField('批量上传任务列表')
     submit = SubmitField('上传任务')
+

@@ -30,6 +30,13 @@ def not_student_login(func):
 def load_user(Id):
     return Teacher.query.get(Id) or Student.query.get(Id)
 
+class Task(db.Model, UserMixin):
+    __tablename__ = 'Task'
+    taskId = db.Column(db.Integer,primary_key=True)
+    taskName = db.Column(db.String(20))
+    taskType = db.Column(db.Integer)
+    teaId = db.Column(db.String(20))
+    deadline = db.Column(db.Date)
 
 class Role(db.Model):
     __tablename__ = 'Role'

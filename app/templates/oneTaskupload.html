@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}添加学生实习信息{% endblock %}
+{% block head %}
+    {{ super() }}
+    <!-- 选择多校外个教师 -->
+    <script>
+        $(document).ready(function () {
+            var j = 1;
+            $("#addcTea").click(function () {
+                $(".cteaForm:first").clone(true).insertAfter(".cteaForm:last");
+                $(".cteaForm:last").slideDown();
+                j++;
+                $(".cteaForm .form-control").eq(j + j + j + j).attr({name: "cteaName" + j});
+                $(".cteaForm .form-control").eq(j + j + j + j + 1).attr({name: "cteaDuty" + j});
+                $(".cteaForm .form-control").eq(j + j + j + j + 2).attr({name: "cteaPhone" + j});
+                $(".cteaForm .form-control").eq(j + j + j + j + 3).attr({name: "cteaEmail" + j});
+                if (j > 1) {
+                    $("#delcTea").show();
+                }
+            });
+            $("#delcTea").click(function () {
+                j--;
+                $(".cteaForm:last").remove();
+                if (j == 1) {
+                    $("#delcTea").slideUp();
+                }
+            });
+            $("#finish").click(function () {
+                $(".cteaForm .form-control").eq(4).attr({name: "cteaName" + 1});
+                $(".cteaForm .form-control").eq(5).attr({name: "cteaDuty" + 1});
+                $(".cteaForm .form-control").eq(6).attr({name: "cteaPhone" + 1});
+                $(".cteaForm .form-control").eq(7).attr({name: "cteaEmail" + 1});
+
+                $(".buttonStd").click();
+                $(".buttonTea").click();
+            });
+        });
+    </script>
+    <!-- 校内指导老师 -->
+     <script>
+        $(document).ready(function () {
+            var i = 1;
+            $("#addTea").click(function () {
+                $(".teaForm:first").clone(true).insertAfter(".teaForm:last");
+                $(".teaForm:last").slideDown();
+                i++;
+                $(".teaForm .form-control").eq(i).attr({name: "teaName" + i});
+                if (i > 1) {
+                    $("#delTea").show();
+                    // $("#addTea").hide();
+                }
+            });
+            $("#delTea").click(function () {
+                i--;
+                $(".teaForm:last").remove();
+                if (i == 1) {
+                    $("#delTea").slideUp();
+                }
+            });
+            $("#finish").click(function () {
+                $(".teaForm .form-control").eq(1).attr({name: "teaName" + 1});
+                $(".buttonStd").click();
+                $(".buttonTea").click();
+            });
+        });
+    </script>
+    <!-- bootstrap日期选择器 -->
+    <script type="text/javascript" src="/static/JS/datetimepicker.min.js" charset="UTF-8"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/static/CSS/bootstrap-datetimepicker.min.css">
+     <script type="text/javascript" src="/static/JS/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <!-- 文件上传 -->
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/CSS/fileinput.min.css">
+    <script type="text/javascript" src="/static/JS/fileinput.min.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="/static/JS/locales/fileinput_locale_zh.js"></script>
+    <!-- 上传等待 -->
+<style>
+.loading{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:300;
+    background-image:url(static/loading.gif);
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-color:#000;
+    background-color:rgba(0,0,0,0.5);
+    filter:alpha(opacity=50);
+}
+</style>
+<script type="text/javascript">
+        function checkForm(){
+            var task=$('#task');
+            var start=$('#start');
+            var end=$('#end');
+            var file=$('#file-1');
+            if(task.val()!==""&&start.val()!==""&&end.val()!==""&&file.val()!==""&&checkDate()){
+                return true;
+            }
+            else
+                return false;
+
+        }
+        function getLoading() {
+            if(checkForm())
+            document.getElementById("ddd").setAttribute('class', 'loading');
+        }
+</script>
+<script type="text/javascript">
+    function checkDate(){
+        var start=$('#start');
+        var end=$('#end');
+        var time1 = new Date(start.val()).getTime();
+        var time2 = new Date(end.val()).getTime();
+    if(time1 >= time2){
+        alert("结束时间不得先于或等于开始时间！");
+        end.val("");
+        start.val("");
+        return false;
+    }
+    else
+        return true;
+}
+</script>
+{% endblock %}
+{% block page_content %}
+    <div class="progress progress-striped active">
+        <div class="progress-bar progress-bar-success" role="progressbar"
+             aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+             style="width: 50%;">
+        </div>
+    </div>
+    <div class="page-header">
+        <h1>请填写任务信息</h1>
+    </div>
+    <div class="panel">
+
+        <div class="panel-body">
+
+
+        <form method="POST" role="form" id="S1" enctype="multipart/form-data" onsubmit="return checkForm()" >
+
+            <h3>任务信息</h3>
+            <div>
+                {{ taskform.hidden_tag() }}
+                {{ taskform.taskName.label }}{{ taskform.taskName(class="form-control",required='',placeholder="请输入任务名字") }}
+                {{ taskform.taskTeaName.label }}{{ taskform.taskTeaName(class="form-control",required='',placeholder="请输入任务所属教师名字") }}
+                {{ taskform.taskType.label }}{{taskform.taskType(class="form-control",required='',placeholder="请输入任务所属教师名字") }}
+                {{ taskform.taskDeadline.label }}{{ taskform.taskDeadline(class="form-control datetimepicker",required='', placeholder="请输入任务截至时间，如：2016-11-11",onchange="checkDate()") }}
+            </div>
+            <br>
+
+            {{ taskform.submit(class="btn btn-success",id='finish',onclick="getLoading()") }}
+        </form>
+
+
+
+{% endblock %}
+{% block scripts %}
+        <!-- bootstrap日期选择器 -->
+        <script type="text/javascript">
+            $('.datetimepicker').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: 'zh-CN',
+                pickDate: true,
+                inputMask: true,
+                autoclose: true,
+                todayBtn: 'linked',
+                todayHighlight: true,
+                minView: "month",
+            });
+        </script>
+            <script type="text/javascript">
+            $('.file').fileinput({
+                language: 'zh', //设置语言
+                allowedFileExtensions : ['jpg', 'png','gif','pdf'],//接收的文件后缀,
+                maxFileCount: 100,
+                showUpload: false, //是否显示上传按钮
+                showCaption: true,//是否显示标题
+                browseClass: "btn btn-primary", //按钮样式
+            });
+</script>
+{% endblock %}
