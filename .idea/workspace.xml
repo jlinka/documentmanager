@@ -2,38 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="44dcc467-1e1a-4ac7-aa40-a5bf53939fe1" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/import_template/taskList_import_template.xlsx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_10.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_12.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_15.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_22.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_24.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_26.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_28.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_33.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_34.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_50.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_56.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_6.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_60.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_64.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_66.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_76.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_84.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_86.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_87.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_90.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/file_cache/xls_import/taskList_import_91.xls" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/addRole.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/batchTaskupload.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/oneTaskupload.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/templates/taskUpload.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/documentmanager-master.iml" afterPath="$PROJECT_DIR$/.idea/documentmanager-master.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/main/form.py" afterPath="$PROJECT_DIR$/app/main/form.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/main/views.py" afterPath="$PROJECT_DIR$/app/main/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models.py" afterPath="$PROJECT_DIR$/app/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/base.html" afterPath="$PROJECT_DIR$/app/templates/base.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -171,6 +140,11 @@
     </findStrings>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="jlinka" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
@@ -634,7 +608,14 @@
       <option name="project" value="LOCAL" />
       <updated>1500535186119</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="add task upload function">
+      <created>1506093636619</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1506093636619</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -643,7 +624,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19038077" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3285568" sideWeight="0.19478957" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3285568" sideWeight="0.8052104" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3285568" sideWeight="0.8052104" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -669,7 +650,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="the Template" />
-    <option name="LAST_COMMIT_MESSAGE" value="the Template" />
+    <MESSAGE value="add task upload function" />
+    <option name="LAST_COMMIT_MESSAGE" value="add task upload function" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
