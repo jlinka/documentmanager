@@ -131,10 +131,12 @@ def getMaxRoleId():
 #任务列表
 excel_export_Task = OrderedDict((('taskId', '任务Id'), ('taskName', '任务名称'), ('taskType', '任务类型'),
                                 ('teaId', '教师Id'), ('deadline',' 截至日期')))
+excel_import_Task = {'taskName': '任务名称', 'taskType': '任务类型', 'taskTeaName':'任务所属教师', 'deadline': '截至日期'}
 
-excel_import_Task ={ 'taskName': '任务名称', 'taskType': '任务类型', 'taskTeaName':'任务所属教师', 'deadline': '截至日期'}
 
-
+#学生名单列表
+excel_export_Student = OrderedDict((('stuId','学号'), ('stuName','学生姓名'), ('teaId', '教师Id'), ('flag', '标记有无上交')))
+excel_import_Student = {'stuId': '学号', 'stuName': '学生姓名', 'teaName': '教师姓名'}
 
 
 IMPORT_FOLDER = os.path.join(os.path.abspath('.'), 'file_cache/xls_import')
@@ -144,7 +146,8 @@ EXPORT_ALL_FOLDER = os.path.join(os.path.abspath('.'), 'file_cache/all_export')
 VISIT_EXPORT_ALL_FOLDER = os.path.join(os.path.abspath('.'), 'file_cache/visit_export')
 
 # 导入excel表, 检查数据是否完整或出错
-EXCEL_IMPORT_CHECK_TASK = [ 'taskName', 'taskType','taskTeaName', 'deadline']
+EXCEL_IMPORT_CHECK_TASK = [ 'taskName', 'taskType', 'taskTeaName', 'deadline']
+EXCEL_IMPORT_CHECK_STUDENT = [ 'stuId', 'stuName', 'teaName']
 
 # 可加上成果的上传文件格式限制
 # ALLOWED_EXTENSIONS = set(['xls', 'xlsx'])
@@ -196,6 +199,7 @@ def batchTaskupload():
         'taskList':
             {'file_name': 'taskList_import_template.xlsx', 'attach_name': '任务批量导入模板.xlsx'}
 
+
     }
     if from_url == 'taskUpload':
         permission = current_user.can(Permission.PERMIS_MANAGE)
@@ -229,7 +233,7 @@ def batchTaskupload():
                 if from_url == "taskList":
 
                     tasklist = excel_import(os.path.join(IMPORT_FOLDER, filename), excel_import_Task,
-                                EXCEL_IMPORT_CHECK_TASK)
+                                EXCEL_IMPORT_CHECK_TASK, from_url)
                     print(tasklist)
                 if tasklist is False:
                     return redirect('/')
@@ -271,6 +275,71 @@ def taskUpload():
     return render_template('taskUpload.html', Permission=Permission, role=role, pagination=pagination)
 
 
+@main.route('/stuListUpload', methods=['GET', 'POST'])
+@login_required
+def stuListUpload():
+    from_url = request.args.get('from_url')
+    print(from_url)
+    temp_dict = {
+        'stuList':
+            {'file_name': 'stuList_import_template.xlsx', 'attach_name': '学生导入模板.xlsx'}
+
+    }
+    print(from_url)
+    if request.method == 'POST':
+        # 模板下载
+        import_template_download = request.form.get('import_template_download')
+        now = datetime.now().date()
+        if import_template_download:
+            file_path = os.path.join(IMPORT_TEMPLATE_FOLDER, temp_dict[from_url]['file_name'])
+            attach_name = temp_dict[from_url]['attach_name']
+            return send_file(file_path, as_attachment=True, attachment_filename=attach_name.encode('utf-8'))
+            # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect('/')
+        file = request.files['file']
+        print("333333")
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect('/')
+        if file and allowed_file(file.filename, ['xls', 'xlsx']):
+            filename = '%s_import_%s.xls' % (from_url, random.randint(1, 99))
+            print("111111")
+            file.save(os.path.join(IMPORT_FOLDER, filename))
+            print("222222")
+            # 上传成功,开始导入
+            try:
+                if from_url == "stuList":
+                    stulist = excel_import(os.path.join(IMPORT_FOLDER, filename), excel_import_Student,
+                                            EXCEL_IMPORT_CHECK_STUDENT, from_url)
+                    print(stulist)
+                    if stulist is False:
+                        return redirect('/')
+
+                    for student, col in zip(stulist, range(len(stulist))):
+
+                        student = Student(
+                            stuId=student['stuId'],
+                            stuName=student['stuName'],
+                            teaId=Teacher.query.filter_by(teaName=student['teaName']).first().teaId
+                        )
+                        db.session.add(student)
+                        db.session.commit()
+                        flash("任务导入成功")
+            except Exception as e:
+                # flash('导入出现异常:%'% str(e))
+                if str(e) == '部分数据有误, 请重新填写':
+                    flash('部分数据有误, 请重新填写')
+                else:
+                    flash('导入失败')
+                    print(from_url, '导入出现异常:', e)
+                    db.session.rollback()
+                    return redirect('/')
+    return render_template('stuListUpload.html', Permission=Permission)
+
 # 下载导出文件
 def export_download(file_path):
     template_dict = {'internlist':'实习信息导出表', 'comlist':'企业信息导出表', 'stuUserList':'学生用户信息导出表', 'teaUserList':'教师用户信息导出表', 'journalList':'日志记录导出表'}
@@ -283,51 +352,94 @@ def export_download(file_path):
 
 
 # 导入Excel
-def excel_import(file, template, check_template):
+def excel_import(file, template, check_template, from_url):
     book = xlrd.open_workbook(file)
     data = []
     for sheet in range(book.nsheets):
         sh = book.sheet_by_index(sheet)
-        col_name = ['taskName', 'taskType', 'taskTeaName', 'deadline']
-        for col in range(sh.ncols):
-            # 如果template里面没找到对应的key,则为None. 所在列的数据也不会录入
-            temp = template.get(sh.cell_value(rowx=0, colx=col))
-            if temp in excel_import_Task.values() and temp in col_name:
-                flash('导入失败: 部分信息有重复, 请使用提供的模板来写入数据')
-                print('导入失败: 部分信息有重复, 请使用提供的模板来写入数据')
-                return False
-            col_name.append(temp)
-        print("555555")
-        # 检查列名是否有错
-        for x in check_template:
-            # print ('template[x]', template[x])
-            if x not in col_name:
-                flash('导入失败: 部分必需信息缺失,请使用提供的模板来写入数据')
-                print('导入失败: 部分必需信息缺失,请使用提供的模板来写入数据'+x)
-                # return redirect('/')
-                return False
-        for row in range(sh.nrows - 1):
-            # 导入数据
-            data_row = {}
+        if(from_url=="taskList"):
+            col_name = ['taskName', 'taskType', 'taskTeaName', 'deadline']
             for col in range(sh.ncols):
-                if col_name[col]:
-                    # excel的日期类型数据会返回float, 此处修改为string
-                    if col_name[col] == 'deadline':
-                        data_row[col_name[col]] = datetime(*xlrd.xldate_as_tuple(sh.cell_value(rowx=row + 1, colx=col), book.datemode)).date()
-                        print(data_row[col_name[col]])
-                        # data_row[col_name[col]] = str(datetime(*xlrd.xldate_as_tuple(sh.cell_value(rowx=row + 1, colx=col), book.datemode)).date())
-                    else:
-                        data_row[col_name[col]] = str(sh.cell_value(rowx=row + 1, colx=col))
-
-            # 检查每行的必要数据是否存在
+                # 如果template里面没找到对应的key,则为None. 所在列的数据也不会录入
+                temp = template.get(sh.cell_value(rowx=0, colx=col))
+                if temp in excel_import_Task.values() and temp in col_name:
+                    flash('导入失败: 部分信息有重复, 请使用提供的模板来写入数据')
+                    print('导入失败: 部分信息有重复, 请使用提供的模板来写入数据')
+                    return False
+                col_name.append(temp)
+            print("555555")
+            # 检查列名是否有错
             for x in check_template:
-                # excel的空白默认为6个' '?
-                if x not in ['deadline']:
-                    if data_row.get(x).strip() is '':
-                        flash('导入失败:有不完整或格式不对的数据,请修改后再导入')
-                        print('导入失败:有不完整或格式不对的数据,请修改后再导入')
-                        return False
-            data.append(data_row)
+                # print ('template[x]', template[x])
+                if x not in col_name:
+                    flash('导入失败: 部分必需信息缺失,请使用提供的模板来写入数据')
+                    print('导入失败: 部分必需信息缺失,请使用提供的模板来写入数据'+x)
+                    # return redirect('/')
+                    return False
+            for row in range(sh.nrows - 1):
+                # 导入数据
+                data_row = {}
+                for col in range(sh.ncols):
+                    if col_name[col]:
+                        # excel的日期类型数据会返回float, 此处修改为string
+                        if col_name[col] == 'deadline':
+                            data_row[col_name[col]] = datetime(*xlrd.xldate_as_tuple(sh.cell_value(rowx=row + 1, colx=col), book.datemode)).date()
+                            print(data_row[col_name[col]])
+                            # data_row[col_name[col]] = str(datetime(*xlrd.xldate_as_tuple(sh.cell_value(rowx=row + 1, colx=col), book.datemode)).date())
+                        else:
+                            data_row[col_name[col]] = str(sh.cell_value(rowx=row + 1, colx=col))
+
+                # 检查每行的必要数据是否存在
+                for x in check_template:
+                    # excel的空白默认为6个' '?
+                    if x not in ['deadline']:
+                        if data_row.get(x).strip() is '':
+                            flash('导入失败:有不完整或格式不对的数据,请修改后再导入')
+                            print('导入失败:有不完整或格式不对的数据,请修改后再导入')
+                            return False
+                data.append(data_row)
+        if (from_url == "stuList"):
+            col_name = ['stuId', 'stuName', 'teaName']
+            for col in range(sh.ncols):
+                # 如果template里面没找到对应的key,则为None. 所在列的数据也不会录入
+                temp = template.get(sh.cell_value(rowx=0, colx=col))
+                if temp in excel_import_Student.values() and temp in col_name:
+                    flash('导入失败: 部分信息有重复, 请使用提供的模板来写入数据')
+                    print('导入失败: 部分信息有重复, 请使用提供的模板来写入数据')
+                    return False
+                col_name.append(temp)
+            print("555555")
+            # 检查列名是否有错
+            for x in check_template:
+                # print ('template[x]', template[x])
+                if x not in col_name:
+                    flash('导入失败: 部分必需信息缺失,请使用提供的模板来写入数据')
+                    print('导入失败: 部分必需信息缺失,请使用提供的模板来写入数据' + x)
+                    # return redirect('/')
+                    return False
+            for row in range(sh.nrows - 1):
+                # 导入数据
+                data_row = {}
+                for col in range(sh.ncols):
+                    if col_name[col]:
+                        # excel的日期类型数据会返回float, 此处修改为string
+                        if col_name[col] == 'deadline':
+                            data_row[col_name[col]] = datetime(
+                                *xlrd.xldate_as_tuple(sh.cell_value(rowx=row + 1, colx=col), book.datemode)).date()
+                            print(data_row[col_name[col]])
+                            # data_row[col_name[col]] = str(datetime(*xlrd.xldate_as_tuple(sh.cell_value(rowx=row + 1, colx=col), book.datemode)).date())
+                        else:
+                            data_row[col_name[col]] = str(sh.cell_value(rowx=row + 1, colx=col))
+
+                # 检查每行的必要数据是否存在
+                for x in check_template:
+                    # excel的空白默认为6个' '?
+                    if x not in ['deadline']:
+                        if data_row.get(x).strip() is '':
+                            flash('导入失败:有不完整或格式不对的数据,请修改后再导入')
+                            print('导入失败:有不完整或格式不对的数据,请修改后再导入')
+                            return False
+                data.append(data_row)
     return data
 
 

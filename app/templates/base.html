@@ -87,7 +87,7 @@
                                 {% if current_user.can(Permission.PERMIS_MANAGE) %}
                                     <li><a href="{{ url_for('main.taskUpload') }}">任务列表上传</a></li>
                                     <li class="divider"></li>
-                                    <li><a>上传学生名单</a></li>
+                                    <li><a href="{{ url_for('main.stuListUpload', from_url='stuList') }}">上传学生名单</a></li>
                                     <li class="divider"></li>
                                 {% endif %}
                                     <li><a>任务上传</a></li>

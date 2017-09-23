@@ -46,7 +46,7 @@ class Role(db.Model):
     # backref='role'可代替Teacher的roleId
     roleDescribe = db.Column(db.String(200))
     teacher = db.relationship('Teacher', backref='role', lazy='dynamic')
-    student = db.relationship('Student', backref='role', lazy='dynamic')
+
 
     def __repr__(self):
         return '<Role %r>' % self.name
@@ -109,8 +109,7 @@ class Student(db.Model, UserMixin):
     stuId = db.Column(db.String(20), primary_key=True)
     stuName = db.Column(db.String(20), index=True)
     teaId = db.Column(db.String(20))
-    roleId = db.Column(db.Integer, db.ForeignKey('Role.roleId'), default=0)
-    password = db.Column(db.String(10))
+    flag =db.Column(db.Integer, default=0)
     #internshipinfor = db.relationship('InternshipInfor', backref='student', lazy='dynamic')
 
 
