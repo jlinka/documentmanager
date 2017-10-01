@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% import "_macros.html"as macros %}
+
+{% block title %}上传探访记录{% endblock %}
+{{ super() }}
+        <!-- 文件上传 -->
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/CSS/fileinput.min.css">
+    <script type="text/javascript" src="/static/JS/fileinput.min.js" charset="UTF-8"></script>
+        <script src="/static/JS/locales/fileinput_locale_zh.js" charset="utf-8"></script>
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#rearch").click(function () {
+                $(".rearchSubmit").click();
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        function select_all() {
+            var checkboxes = document.getElementsByName('approve[]');
+            var button = document.getElementById('toggle');
+
+            if (button.value == '全选') {
+                for (var i in checkboxes) {
+                    checkboxes[i].checked = 'FALSE';
+                }
+                button.value = '全不选'
+            } else {
+                for (var i in checkboxes) {
+                    checkboxes[i].checked = '';
+                }
+                button.value = '全选';
+            }
+        }
+    </script>
+    <!--筛选按钮-->
+    <script type="text/javascript">
+        window.onload = function () {
+            var obj = document.getElementById("sel");
+            obj.onclick = function () {
+                obj.className = (obj.className == "class1" ? "class2" : "class1");
+                obj.value = (obj.value == "收起筛选" ? "显示筛选" : "收起筛选");
+            }
+        }
+    </script>
+     <!--更多-->
+    <style>
+        .first .second {
+            display: none;
+        }
+
+        .first:hover .second {
+            display: block;
+        }
+    </style>
+ {% endblock %}
+
+ {% block page_content %}
+    <div class="page-header">
+        <h1>请填写选择该次探访的相关学生。
+
+        </h1>
+
+
+        <table class="table" id="t">
+        <thead>
+        <tr>
+            <th>学号</th>
+            <th>姓名</th>
+            <th>上传</th>
+        </tr>
+        </thead>
+        <tbody>
+            <form method="POST" action="" enctype=multipart/form-data>
+                {% for task in task_info %}
+                    <tr>
+
+                        <td>{{ task.stuId }}</td>
+                        <td>{{ task.stuName}}</td>
+
+                        {% if task.flag==1 %}
+
+                            <td>
+                                <a href="{{ url_for('main.uploadrarFile', from_url='teaUploadTask', stuId=task.stuId, stuName=task.stuName) }}">重新上传</a>
+                            </td>
+                        {% endif %}
+                        {% if task.flag==0 %}
+
+                            <td>
+
+                                <a href="{{ url_for('main.uploadrarFile', from_url='teaUploadTask', stuId=task.stuId, stuName=task.stuName) }}">上传</a>
+                            </td>
+                        {% endif %}
+
+                    </tr>
+                {% endfor %}
+            </form>
+        </tbody>
+    </table>
+
+
+
+
+
+
+    {% if pagination %}
+        <div class="pagination">
+            {{ macros.pagination_widget(pagination,'.teaUploadTask') }}
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}
+
+
+  {% block scripts %}
+            <script type="text/javascript">
+            $('.file').fileinput({
+                language: 'zh', //设置语言
+               //接收的文件后缀,
+                maxFileCount: 100,
+                showUpload: true, //是否显示上传按钮
+                showCaption: true,//是否显示标题
+                browseClass: "btn btn-primary", //按钮样式
+            });
+            </script>
+{% endblock %}

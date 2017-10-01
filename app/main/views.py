@@ -4,7 +4,7 @@ from flask import render_template, url_for, flash, redirect, request, session, s
 from .form import searchForm, permissionForm,taskForm
 from . import main
 from ..models import Permission,  Student, Role, Teacher, \
-    not_student_login,Grade,Task
+    not_student_login,Grade,Task,File
 
 from flask.ext.login import current_user, login_required
 from .. import db
@@ -263,29 +263,126 @@ def batchTaskupload():
                     return redirect('/')
     return render_template('batchTaskupload.html', Permission=Permission)
 
+@main.route('/uploadrarFile', methods=['GET', 'POST'])
+@login_required
+def uploadrarFile():
+    from_url = request.args.get('from_url')
+    stuId = request.args.get('stuId')
+    stuName = request.args.get('stuName')
+    if from_url == 'uploadrarFile':
+        permission = current_user.can(Permission.PERMIS_MANAGE)
+    print(from_url)
+    if request.method == 'POST':
+
+        file = request.files['file']
+        print("333333")
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect('/')
+        if file and allowed_file(file.filename, ['zip', 'rar']):
+            filename = '%s_import_%s.rar' % (from_url, random.randint(1, 99))
+            print(filename)
+            file.save(os.path.join(IMPORT_FOLDER, filename))
+            teaId = Student.query.filter_by(stuId=stuId).first().teaId
+            # 上传成功,开始导入
+            try:
+                print(stuId)
+                db.session.execute(' \
+                                   update Student set \
+                                   flag = %s \
+                                   where stuId="%s"' \
+                                   % (1, stuId))
+                file = File(
+                    fileName=filename,
+                    stuId=stuId,
+                    taskId=Task.query.filter_by(teaId=teaId).first().taskId,
+                    submitTime=datetime.now().date()
+                )
+                db.session.add(file)
+                db.session.commit()
+
+            except Exception as e:
+                # flash('导入出现异常:%'% str(e))
+                if str(e) == '部分数据有误, 请重新填写':
+                    flash('部分数据有误, 请重新填写')
+                else:
+                    flash('导入失败')
+
+                    db.session.rollback()
+                    return redirect('/')
+    return render_template('uploadrarFile.html', Permission=Permission, stuId=stuId, stuName=stuName)
+
 @main.route('/taskUpload', methods=['GET', 'POST'])
 @login_required
 def taskUpload():
-    # 非管理员,不能进入
     if not current_user.can(Permission.PERMIS_MANAGE):
         return redirect('/')
     page = request.args.get('page', 1, type=int)
     pagination = Role.query.paginate(page, per_page=100, error_out=False)
     role = pagination.items
-    return render_template('taskUpload.html', Permission=Permission, role=role, pagination=pagination)
+
+    return render_template('taskUpload.html', Permission=Permission, role=role)
+
+
+@main.route('/teaUploadTask', methods=['GET', 'POST'])
+@login_required
+def teaUploadTask():
+    from_url = request.args.get('from_url')
+
+    page = request.args.get('page', 1, type=int)
+    pagination = Role.query.paginate(page, per_page=100, error_out=False)
+    role = pagination.items
+    userId = current_user.get_id()
+    print(userId)
+    if request.method == 'POST':
+        file = request.files['file']
+        print(file.filename)
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect('/')
+        if file and allowed_file(file.filename, ['zip', 'rar']):
+            filename = '%s_import_%s.rar' % (from_url, random.randint(1, 99))
+            print(filename)
+            file.save(os.path.join(IMPORT_FOLDER, filename))
+        stuId = request.form.get('stuId')
+
+        print(stuId)
+        db.session.execute(' \
+                update Student set \
+                flag = %s \
+                where stuId="%s"' \
+                       % (1, stuId))
+
+
+    # 非管理员,不能进入
+    if not current_user.can(Permission.PERMIS_MANAGE):
+        pagination = Student.query.filter(Student.teaId == userId).paginate(page, per_page=20, error_out=False)
+        task_info = pagination.items
+        return render_template('teaUploadTask.html', Permission=Permission, role=role, pagination=pagination,
+                               task_info=task_info)
+    pagination= Student.query.filter().paginate(page, per_page=20, error_out=False)
+    task_info = pagination.items
+    return render_template('teaUploadTask.html', Permission=Permission, role=role, pagination=pagination, task_info=task_info)
+
 
 
 @main.route('/stuListUpload', methods=['GET', 'POST'])
 @login_required
 def stuListUpload():
     from_url = request.args.get('from_url')
-    print(from_url)
+
     temp_dict = {
         'stuList':
             {'file_name': 'stuList_import_template.xlsx', 'attach_name': '学生导入模板.xlsx'}
 
     }
-    print(from_url)
+
     if request.method == 'POST':
         # 模板下载
         import_template_download = request.form.get('import_template_download')
@@ -299,7 +396,7 @@ def stuListUpload():
             flash('No file part')
             return redirect('/')
         file = request.files['file']
-        print("333333")
+
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
