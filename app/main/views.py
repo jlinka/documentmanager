@@ -191,6 +191,42 @@ def oneTaskupload():
     return render_template('oneTaskupload.html', taskform=taskform,
                            Permission=Permission)
 
+@main.route('/changeTask', methods=['GET', 'POST'])
+@login_required
+def changeTask():
+    taskName = request.args.get('taskName')
+    taskType = request.args.get('taskType')
+    teaName = request.args.get('teaName')
+    deadline = request.args.get('deadline')
+    taskId = request.args.get('taskId')
+    print(deadline)
+    try:
+        if request.method == 'POST':
+            taskTeaName = request.form.get('taskTeaName')
+            teaId = Teacher.query.filter_by(teaName=taskTeaName).first().teaId
+            taskName = request.form.get('taskName')
+            taskType = request.form.get('taskType')
+            taskDeadline = request.form.get('taskDeadline')
+            db.session.execute('update Task set taskName="%s", taskType=%s, teaId="%s", deadline="%s" where taskId=%s' %(
+                taskName, taskType, teaId, taskDeadline,taskId))
+
+
+            db.session.commit()
+            flash('提交任务信息成功！')
+            return redirect(url_for('.showAllTask', flag=5))
+    except Exception as e:
+        print("任务信息：", e)
+        db.session.rollback()
+        flash('提交任务信息失败，请重试！')
+        return redirect(url_for('.changeTask', taskId=taskId, taskName=taskName, teaName=taskTeaName, deadline=taskDeadline, taskType=taskType))
+
+    taskform = taskForm()
+
+
+
+    return render_template('changeTask.html',
+                           Permission=Permission, taskform=taskform, taskName=taskName, taskType=taskType, teaName=teaName, deadline=deadline)
+
 @main.route('/batchTaskupload', methods=['GET', 'POST'])
 @login_required
 def batchTaskupload():
@@ -336,28 +372,7 @@ def teaUploadTask():
     role = pagination.items
     userId = current_user.get_id()
     print(userId)
-    if request.method == 'POST':
-        file = request.files['file']
-        print(file.filename)
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect('/')
-        if file and allowed_file(file.filename, ['zip', 'rar']):
-            filename = '%s_import_%s.rar' % (from_url, random.randint(1, 99))
-            print(filename)
-            file.save(os.path.join(IMPORT_FOLDER, filename))
-        stuId = request.form.get('stuId')
 
-        print(stuId)
-        db.session.execute(' \
-                update Student set \
-                flag = %s \
-                where stuId="%s"' \
-                       % (1, stuId))
 
 
     # 非管理员,不能进入
@@ -370,6 +385,44 @@ def teaUploadTask():
     task_info = pagination.items
     return render_template('teaUploadTask.html', Permission=Permission, role=role, pagination=pagination, task_info=task_info)
 
+
+@main.route('/showAllTask', methods=['GET', 'POST'])
+@login_required
+def showAllTask():
+    from_url = request.args.get('from_url')
+
+    page = request.args.get('page', 1, type=int)
+    pagination = Role.query.paginate(page, per_page=100, error_out=False)
+    role = pagination.items
+    userId = current_user.get_id()
+    print(userId)
+    try:
+        if from_url == 'deleteTask':
+            taskId = request.args.get('taskId')
+            print(taskId)
+            db.session.execute('delete from Task where taskId=%s' % taskId)
+
+            flash('删除任务信息成功！')
+            return redirect(url_for('.showAllTask', flag=5))
+    except Exception as e:
+        print("任务信息：", e)
+        db.session.rollback()
+        flash('提交任务信息失败，请重试！')
+        return redirect(url_for('.changeTask', taskId=taskId, taskName=taskName, teaName=taskTeaName, deadline=taskDeadline, taskType=taskType))
+    # 非管理员,不能进入
+    if not current_user.can(Permission.PERMIS_MANAGE):
+        pagination = Task.query.join(Teacher,Teacher.teaId==Task.teaId).add_columns(Task.taskId,Task.taskName,
+                                                                                    Task.taskType,Task.teaId,
+                                                                                    Task.deadline,Teacher.teaName).filter(Task.teaId==userId).paginate(page, per_page=20, error_out=False)
+        task_info = pagination.items
+        return render_template('showAllTask.html', Permission=Permission, role=role, pagination=pagination,
+                               task_info=task_info)
+    pagination = Task.query.join(Teacher,Teacher.teaId==Task.teaId).add_columns(Task.taskId,Task.taskName,
+                                                                                    Task.taskType,Task.teaId,
+                                                                                    Task.deadline,Teacher.teaName).paginate(page, per_page=20, error_out=False)
+    task_info = pagination.items
+    return render_template('showAllTask.html', Permission=Permission, role=role, pagination=pagination,
+                           task_info=task_info)
 
 
 @main.route('/stuListUpload', methods=['GET', 'POST'])

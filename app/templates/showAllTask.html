@@ -1,10 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% import "_macros.html"as macros %}
 
-</body>
-</html>
+{% block title %}上传探访记录{% endblock %}
+{{ super() }}
+        <!-- 文件上传 -->
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/CSS/fileinput.min.css">
+    <script type="text/javascript" src="/static/JS/fileinput.min.js" charset="UTF-8"></script>
+        <script src="/static/JS/locales/fileinput_locale_zh.js" charset="utf-8"></script>
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#rearch").click(function () {
+                $(".rearchSubmit").click();
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        function select_all() {
+            var checkboxes = document.getElementsByName('approve[]');
+            var button = document.getElementById('toggle');
+
+            if (button.value == '全选') {
+                for (var i in checkboxes) {
+                    checkboxes[i].checked = 'FALSE';
+                }
+                button.value = '全不选'
+            } else {
+                for (var i in checkboxes) {
+                    checkboxes[i].checked = '';
+                }
+                button.value = '全选';
+            }
+        }
+    </script>
+    <!--筛选按钮-->
+    <script type="text/javascript">
+        window.onload = function () {
+            var obj = document.getElementById("sel");
+            obj.onclick = function () {
+                obj.className = (obj.className == "class1" ? "class2" : "class1");
+                obj.value = (obj.value == "收起筛选" ? "显示筛选" : "收起筛选");
+            }
+        }
+    </script>
+     <!--更多-->
+    <style>
+        .first .second {
+            display: none;
+        }
+
+        .first:hover .second {
+            display: block;
+        }
+    </style>
+ {% endblock %}
+
+ {% block page_content %}
+    <div class="page-header">
+
+
+
+        <table class="table" id="t">
+        <thead>
+        <tr>
+            <th>任务Id</th>
+            <th>任务名称</th>
+            <th>任务所属教师</th>
+            <th>截至时间</th>
+            <th>修改任务</th>
+            <th>删除任务</th>
+        </tr>
+        </thead>
+        <tbody>
+            <form method="POST" action="" enctype=multipart/form-data>
+                {% for task in task_info %}
+                    <tr>
+
+                        <td>{{ task.taskId }}</td>
+                        <td>{{ task.taskName}}</td>
+                        <td>{{ task.teaName }}</td>
+                        <td>{{ task.deadline }}</td>
+                        <td><a href="{{ url_for('main.changeTask', from_url='changeTask', taskId=task.taskId, taskName=task.taskName, teaName=task.teaName, deadline=task.deadline, taskType=task.taskType) }}">修改</a></td>
+                        <td><a href="{{ url_for('main.showAllTask', from_url='deleteTask', taskId=task.taskId) }}">删除</a></td>
+                    </tr>
+                {% endfor %}
+            </form>
+        </tbody>
+    </table>
+
+    {% if pagination %}
+        <div class="pagination">
+            {{ macros.pagination_widget(pagination,'.showAllTask') }}
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}
+

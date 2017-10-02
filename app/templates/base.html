@@ -103,9 +103,8 @@
                                 <ul class="dropdown-menu">
 
 
-                                    <li><a>查看所有任务</a></li>
-                                    <li class="divider"></li>
-                                    <li><a>查看已交文件</a></li>
+                                    <li><a href="{{ url_for('main.showAllTask', from_url='showAllTask') }}">查看所有任务</a></li>
+
                                     {% if current_user.can(Permission.PERMIS_MANAGE) %}
                                         <li class="divider"></li>
                                         <li><a>查看教师上交进度</a></li>
